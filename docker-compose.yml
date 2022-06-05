@@ -1,0 +1,10 @@
+version: "3.3"
+services:
+  cam-miner-01:
+    build: .
+    container_name: cam-miner-01
+    volumes:
+      - "./config/:/app/config/"
+    ports:
+      - "5555:5555"
+    restart: always
