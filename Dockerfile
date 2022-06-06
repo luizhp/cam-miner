@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update -yq && \
     apt-get -yq install python3-opencv && \
     apt-get -yq upgrade && \
@@ -14,4 +16,4 @@ COPY ["app.py", "config", "./"]
 
 VOLUME ["/app/config"]
 
-CMD [ "python3", "app.py", "--host=0.0.0.0"]
+CMD [ "python3", "-u", "app.py", "--host=0.0.0.0"]
