@@ -1,9 +1,8 @@
-import os
-import cv2
-import time
 import simplejpeg
 import imagezmq
 import configparser
+from VideoCapture import VideoCapture
+from VideoBufferless import VideoBufferless
 
 config = configparser.ConfigParser()
 config.read('config/app.ini')
@@ -17,40 +16,16 @@ HEIGHT = int(config['FRAME']['HEIGHT'])
 if __name__ == "__main__":
 
     sender = imagezmq.ImageSender("tcp://*:{}".format(PORT), REQ_REP=False)
+    camera = VideoCapture(CAMURL, WIDTH, HEIGHT)
 
-    def work_with_captured_video(camera, sender):
+    if camera.isOpened():
+        print('Camera is connected')
+        cap = VideoBufferless(camera)
         while True:
-            ret, frame_current = camera.read()
-
-            if not ret:
-                print("Camera is disconnected!")
-                camera.release()
-                return False
-            else:
-                jpg_buffer = simplejpeg.encode_jpeg(
-                    frame_current, quality=JPEG_QUALITY, colorspace='BGR')
-                sender.send_jpg(CAMNAME, jpg_buffer)
-        return True
-
-    while True:
-        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
-        print('Conecting camera')
-        camera = cv2.VideoCapture(CAMURL, cv2.CAP_FFMPEG)
-        camera.set(cv2.CAP_PROP_BUFFERSIZE, 2)
-
-        camera.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
-        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-
-        if camera.isOpened():
-            print('Camera is connected')
-            response = work_with_captured_video(camera, sender)
-            if response == False:
-                print('Camera Failed')
-                time.sleep(2)
-            continue
-        else:
-            print('Camera not connected')
-            camera.release()
-            time.sleep(2)
-            continue
-    cv2.destroyAllWindows()
+            frame = cap.read()
+            jpg_buffer = simplejpeg.encode_jpeg(
+                frame, quality=JPEG_QUALITY, colorspace='BGR')
+            sender.send_jpg(CAMNAME, jpg_buffer)
+    else:
+        print('Camera not connected')
+        camera.release()
