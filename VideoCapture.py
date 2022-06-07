@@ -8,8 +8,15 @@ class VideoCapture:
 
         print('Conecting camera')
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        
+        _w  = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        _h  = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        
+        if _w > width:
+          self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        
+        if _h > height:
+          self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
     def read(self):
         return self.cap.read()
