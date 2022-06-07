@@ -1,3 +1,4 @@
+import os
 import cv2
 import time
 import simplejpeg
@@ -26,17 +27,20 @@ if __name__ == "__main__":
                 camera.release()
                 return False
             else:
-                frame_current = cv2.resize(frame_current, (WIDTH, HEIGHT))
                 jpg_buffer = simplejpeg.encode_jpeg(
                     frame_current, quality=JPEG_QUALITY, colorspace='BGR')
-                # ret_code, jpg_buffer = cv2.imencode(
-                #    ".jpg", frame_current, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
                 sender.send_jpg(CAMNAME, jpg_buffer)
         return True
 
     while True:
+        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
         print('Conecting camera')
-        camera = cv2.VideoCapture(CAMURL)
+        camera = cv2.VideoCapture(CAMURL, cv2.CAP_FFMPEG)
+        camera.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+
+        camera.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+
         if camera.isOpened():
             print('Camera is connected')
             response = work_with_captured_video(camera, sender)
