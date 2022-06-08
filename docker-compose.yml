@@ -5,6 +5,7 @@ services:
     container_name: cam-miner-01
     volumes:
       - "./config/:/app/config/"
+      - "/etc/localtime:/etc/localtime:ro"
     ports:
       - "5555:5555"
     restart: unless-stopped
