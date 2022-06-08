@@ -1,31 +1,28 @@
 import simplejpeg
 import imagezmq
-import configparser
+
+from Config import Config
 from VideoCapture import VideoCapture
 from VideoBufferless import VideoBufferless
 
-config = configparser.ConfigParser()
-config.read('config/app.ini')
-CAMNAME = config['CAM']['NAME']
-CAMURL = config['CAM']['URL']
-PORT = int(config['SENDER']['PORT'])
-JPEG_QUALITY = int(config['FRAME']['JPEG_QUALITY'])
-WIDTH = int(config['FRAME']['WIDTH'])
-HEIGHT = int(config['FRAME']['HEIGHT'])
-
 if __name__ == "__main__":
 
-    sender = imagezmq.ImageSender("tcp://*:{}".format(PORT), REQ_REP=False)
-    camera = VideoCapture(CAMURL, WIDTH, HEIGHT)
+    config = Config()
+    sender = imagezmq.ImageSender(
+        "tcp://*:{}".format(config.get('SENDER', 'PORT')), REQ_REP=False)
+    camera = VideoCapture(config.get('CAM', 'URL'), config.get(
+        'FRAME', 'WIDTH'), config.get('FRAME', 'HEIGHT'))
 
     if camera.isOpened():
         print('Camera is connected')
+        camname = config.get('CAM', 'NAME')
+        jpeg_quality = config.get('FRAME', 'JPEG_QUALITY')
         cap = VideoBufferless(camera)
         while True:
             frame = cap.read()
             jpg_buffer = simplejpeg.encode_jpeg(
-                frame, quality=JPEG_QUALITY, colorspace='BGR')
-            sender.send_jpg(CAMNAME, jpg_buffer)
+                frame, quality=jpeg_quality, colorspace='BGR')
+            sender.send_jpg(camname, jpg_buffer)
     else:
         print('Camera not connected')
         camera.release()
