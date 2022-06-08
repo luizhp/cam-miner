@@ -6,7 +6,6 @@ class VideoCapture:
     def __init__(self, url, width, height):
         os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
 
-        print('Conecting camera')
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
         
         _w  = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)

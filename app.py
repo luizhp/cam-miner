@@ -8,8 +8,12 @@ from VideoBufferless import VideoBufferless
 if __name__ == "__main__":
 
     config = Config()
+
+    print('Start imagezmq publisher')
     sender = imagezmq.ImageSender(
         "tcp://*:{}".format(config.get('SENDER', 'PORT')), REQ_REP=False)
+    
+    print('Conecting camera')
     camera = VideoCapture(config.get('CAM', 'URL'), config.get(
         'FRAME', 'WIDTH'), config.get('FRAME', 'HEIGHT'))
 
