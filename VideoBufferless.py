@@ -1,9 +1,11 @@
 import queue
 import threading
+from utilities import util
 
 class VideoBufferless:
 
     def __init__(self, camera):
+        self.logger = util.get_logger('cam-miner')
         self.cap = camera
         self.q = queue.Queue()
         t = threading.Thread(target=self._reader)
@@ -15,7 +17,7 @@ class VideoBufferless:
         while True:
             ret, frame = self.cap.read()
             if not ret:
-                print("Camera is disconnected!")
+                self.logger.error("Camera is disconnected!")
                 self.cap.release()
                 break
             if not self.q.empty():

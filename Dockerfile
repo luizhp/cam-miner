@@ -12,7 +12,7 @@ RUN apt-get update -yq && \
     pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-COPY ["app.py", "config", "VideoBufferless.py", "VideoCapture.py", "Config.py", "./"]
+COPY ["app.py", "config", "VideoBufferless.py", "VideoCapture.py", "Config.py", "utilities.py", "./"]
 
 VOLUME ["/app/config"]
 
