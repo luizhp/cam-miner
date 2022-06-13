@@ -33,3 +33,4 @@ if __name__ == "__main__":
         else:
             logger.error('Camera not connected')
             camera.release()
+            sender.close()
